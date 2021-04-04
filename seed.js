@@ -37,7 +37,7 @@ class SeedApplication {
         const boxes = [];
 
         for (let i = 0; i < NUM; i++) {
-            const geom = new THREE.BoxGeometry(2, 2, 2);
+            const geom = new THREE.BoxGeometry(0.02, 0.02, 0.02);
             const mat = new THREE.MeshLambertMaterial();
             const box = new THREE.Mesh(geom, mat);
 
