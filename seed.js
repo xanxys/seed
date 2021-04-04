@@ -30,6 +30,41 @@ class SeedApplication {
 
         const axesHelper = new THREE.AxesHelper(1);
         this.scene.add(axesHelper);
+
+        
+        
+        const NUM = 100;
+        const boxes = [];
+
+        for (let i = 0; i < NUM; i++) {
+            const geom = new THREE.BoxGeometry(2, 2, 2);
+            const mat = new THREE.MeshLambertMaterial();
+            const box = new THREE.Mesh(geom, mat);
+
+            this.scene.add(box);
+            boxes.push(box);
+        }
+
+        // Worker
+        const physicsWorker = new Worker('./worker.js');
+
+        physicsWorker.onmessage = function (event) {
+            if (event.data === "DONE") {
+                physicsWorker.postMessage(NUM);
+                return;
+            } 
+
+            const data = event.data;
+            if (data.objects.length != NUM) return;
+            for (var i = 0; i < NUM; i++) {
+                const physBox = data.objects[i];
+
+                const box = boxes[i];
+                box.position.set(physBox[0], physBox[1], physBox[2]);
+                box.quaternion.set(physBox[3], physBox[4], physBox[5], physBox[6]);
+                box.matrixWorldNeedsUpdate = true;
+            }
+        };
     }
 
     animate() {
@@ -37,10 +72,11 @@ class SeedApplication {
         this.renderer.render(this.scene, this.camera);
         requestAnimationFrame(() => this.animate());
     }
-
 }
 
 
 
 const app = new SeedApplication(window.innerWidth, window.innerHeight, document.getElementById('main'));
 app.animate();
+
+
